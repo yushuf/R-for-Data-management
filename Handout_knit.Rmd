@@ -1,0 +1,941 @@
+---
+title: "Traceable and re-producible data management using R"
+author: "Yushuf Sharker"
+output:
+  pdf_document: default
+  html_document: default
+date: '2022-08-29'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+rm(list = ls())
+setwd("Q:/Scientific/YS/R_workshop")
+token = "80D5CB91DD8DF5C28BA0E232BF9ACA63"
+library(tidyverse)
+```
+
+# Session 1: R Basics
+
+## Traceability, and re-producibility
+
+* The capacity to track every transformation, dead-end, or link between the 
+data points.
+  +	To make the research result trustworthy. We transform, structure, 
+  and analyze data to reach the result. Reliable results are grounded on 
+  the original experiments.
+  +	Regulatory
+  +	Mistakes can be traced back to the root
+*	A process is said to be reproducible, If I provide the same input in a 
+process again, the process will retain the same output as before.
+
+##	R 
+*	R is a programming language primarily created for statisticians in 1993 by the
+statisticians.
+*	 R has an integrated set of functions to perform data manipulation and analytics. 
+*	There are specific rules to make the functions understandable to the R-interpreter which is the goal of the workshop
+
+##	R-studio for windows
+*	R-studio is an open-source integrated development environment (IDE), that facilitates editor with syntax highlighter, running codes, and workspace management.  There are 4 windows in R studio.
+
+    +	Console: command lines: submit commands and observe returns in this window. 
+    +	Text editor: Space for scripting r functions. The R interpreter executes the scrips from top to         bottom you can open multiple tabs, and write, and run codes from the multiple tabs. Codes will be         executed based on what data and functions are available in the R environment. You can select a        part of the code or the whole code to run.
+    +	Workspace browser: To explore what is available in the R environment
+    +	Plot viewer: View plots, results, help, and packages.
+*	`Ctrl+ enter`, up and down arrow, esc,` Ctrl+shift+A` (for allignment)and 
+  `Ctrl+shift+C` (for comment) are important shortcuts in Rstudio.
+*	Rstudio is a powerful tool that provides support to re-producible data 
+  analytics code writing. Please  explore the Rstudio website to customize the look and functions of     Rstudio. 
+
+
+## R functions
+There are specific names in R to perform specific operations which are indicated
+as functions.
+
+* R is case-sensitive. Extra space in the writing function does not affect the result. 
+*	Functions/commands are always followed by closed round parenthesis. Within the 
+parenthesis, the command takes the inputs. Inputs in a function are called 
+arguments. Arguments could be null, data of any form, logic, any command, 
+or any combination of these. `c` is for concatenate a set that returns the 
+vector of the set. `mean` is to find
+mean of vectors given as argument. Please follow the examples
+
+
+```{r }
+c(2,3,5,NA)
+```
+a few notes:
+*	Functions can be used as an argument of a function. In that case, the innermost function will be executed first. The output of the inner functions will be used as input for the outer functions. for example
+```{r }
+mean( c(2,3,5,6) )
+```
+where the output of `c` function will be considered as input of the mean function.
+
+* Some arguments are mandatory and some are set as default. For example  
+```{r }
+mean(c(2,3,5,NA))
+```
+The `mean function returns `NA` as the default argument of `mean` is 
+`na.rm = FALSE`. We may change this as follows
+
+```{r }
+mean(c(2,3,5,NA), na.rm = TRUE)
+```
+* Some functions does not need any argument. for example 
+```{r }
+date()
+```
+Returns the today's date
+
+*	You can write your own custom functions using the available functions in R.
+this will be discussed in Session 3
+
+##	Run the functions
+*	A selected part from the text editor and select Run, ctrl+enter
+*	One by one in the console
+*	Write and save the script and call the script to run using another R session 
+or terminal 
+*	Unless pre-selected, all outputs will be displayed in the console or 
+viewer windows
+
+
+## R Packages
+
+*	Packages are an extension of the functionality of R. Authors often create 
+multiple functions and combined them under a package to perform a customized 
+action. A user can use the packages rather than write the code from the scratch. 
+for Example: `dplyr` is a grammar of data manipulation used for data management 
+in R
+
+*	You might find multiple packages to do a similar task in CRAN. 
+    +	Install and use packages: `install.packages(“dplyr”)`
+    + Load the package: `library(“dplyr”)`
+    +	Remove packages from the R environment forever: `remove.packages("dplyr ")`
+  
+*	Sometimes, it is difficult to plan which package should I use for my purpose. 
+Research and discuss in the R communities. You can find your packages from 
+thousands of R packages from CRAN
+
+*	You can write your custom functions for some of your specialized processing. 
+Once you have multiple custom functions, you can combine them under a 
+package and launch the package under CRAN.  
+
+
+
+```{r }
+install.packages("dplyr") # One time
+library("dplyr") # load the package in the R environment
+# remove.packages("dplyr")
+```
+
+After loading the package in the R environment, the functions under `dplyr` will
+be available to use. 
+
+
+##	Working directory 
+
+  +	getwd() tells you the current working directory, 
+  +	setwd(“path“) Set a new working directory. We set a working directory 
+  related to specific projects and people. A network path can also be used 
+  in setwd().
+  +	Setting a working directory is required for traceability and 
+  reproducibility of data processing
+
+```{r }
+getwd() # current working directory
+setwd("Q:/Scientific/YS/R_workshop") # Copy the address from windows explorer 
+                                     # replace \ with /
+```
+
+##	Saving and loading works
+
+*	Save the script, R environment, and history for future use
+*	Open R script and R environment
+
+```{r }
+save.image(file='myEnvironment.RData') # where it will be saved?
+# Suppose you already have an image file by name "myEnvironment.RData". You have
+# to replace the previous with a new data.
+load("myEnvironment.RData")
+```
+
+##	Human readable code 
+
+*	The code should be readable and interpretable by a human. 
+*	Use # comment to write information about code, data
+*	Too much detail is discouraged 
+*	Load all the libraries for the script
+*	Set the directory for the data and output
+*	Write codes in such a way that a small part of codes are interpretable
+
+##	Objects in R
+
+*	Vectors
+    +	A sequence of the same types of data
+    +	Types of vectors (character, numeric, logical, factor)
+    +	Creating a vector
+    +	Assign a vector to a name
+    +	Sort, table, length
+    +	Mathematical operations of vectors
+    +	Conditional operations of vectors
+    +	Missing values in (string vs numeric)
+    + There are four types of vector: Numeric, logical, factor, ordered factor,
+    and character. Factors are nominal, and ordered factors are the ordinal 
+    variables. Logical takes values true and false.
+    +	Attributes and sub-setting, Extract elements from vectors
+    +	Summary
+  
+*	Data frame
+    +	Combines different kinds of vectors connected by row-names
+    +	Creating a data frame: data.frame(), as.data.frame(any r object)
+    +	Names(data) <-c()
+    +	List sub-setting, $x, ASQ6[["record_id"]], ASQ6[[1]]
+    +	Sub-setting: matrix sub-setting
+    +	Problem with this data manipulation
+    +	Attributes: names, nrow, ncol, dim, head, tail, class, str
+    +	Attributes (str(), head(), tail())
+
+*	List
+    +	List is a general form of object that can included any kind of data objects.
+    +	Create a list
+    +	Access the listed content
+    
+o	Matrix and array will be discussed later. Matrix is very similar to the 
+data frame and arrays are the list of multiple matrices of the same order.
+
+### Creating a vector
+
+```{r }
+1:10
+c(1:10, 20:25)
+Sex <- c(2 , 2, 2, 1, 2, 1, 2, 1, 1, 2, 2, 2, 2, 1, 2, 2)
+clusterID <- c(   "C3",   "C3",   "C3",   "C3",   "C3",   "C1",   "C1",   "C1",
+                  "C1",   "C1", "C2",   "C2",   "C2",   "C2",   "C2",   "C3" )
+# A character missing values could be included in a character vector
+
+clusterIDNA <- c(   "C3",   "C3",   "",   "C3",   "C3",   "C1",   "C1",   "C1", 
+                    "C1",   "C1", "C2",   "C2",   "C2",   "C2",   "C2",   "" )
+
+age <- c( 30,       36,           25,           19,           18,           29,
+          20,           25,           35,           28,           18,       30,
+          47,           18,           20,           40 
+          )
+pain <- c( 1, 1, 3, 3, 3, 3, 3, 1, 1, 3, 3, 1, 3, 3, 3, 1 )
+
+painYn <- c(0,0, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0,  1, 1,  1, 0)
+ 
+marital <- c(1,1, 1, 4, 4, 1, 1, 1, 1, 1, 4, 1, 3, 4, 1, 2)
+
+householdID <- c( "I0008",   "I0016",   "I0024",   "I0032",   "I0041", 
+                  "I0736",   "I0744",   "I0753",   "I0760",   "I0768", 
+                  "I1456",   "I1464",   "I1472",   "I1480",   "I1491",
+                  "I0048" )
+
+ageNA <- c(30,            36,            25,            19,            18,
+           29,            20,            25,            35,            NA,
+           18,            30,            47,            18,            20,
+           40)
+```
+
+### Vector operations
+
+```{r }
+sort(clusterID) # Challange sort in decreasing order
+table(clusterID)
+length(clusterID)
+length(clusterIDNA)
+
+# Mathematical operations
+age + 1
+age + rep(1, length(age))
+age*2
+age^2
+ageNA + 1
+summary(age)
+summary(ageNA)
+!("C3" %in% clusterID)
+age/7
+
+
+# Conditional operations
+age >28
+
+# invalid mathematical operations
+Sex + 1 
+Sex^2
+summary(Sex)
+# Do you feel any problem? Sex +1 should not make sense
+
+# Check vectors type
+class(Sex)
+class(age)
+str(Sex)
+str(ageNA)
+class(clusterID)
+```
+
+### Convert vectors to the right type
+```{r }
+# Let us fix the type of vectors
+Sex <- factor(
+  x = Sex,
+  levels = c(1,2),
+  labels = c("Male", "Female")
+)
+
+pain <- factor(
+  x = pain,
+  levels = c(1,2, 3),
+  labels = c("No Pain", "Mild Pain", "Severe Pain"),
+  ordered = TRUE
+)
+
+marital <- factor(
+  x = marital,
+  levels = c(1,2,3,4),
+  labels =  c("Married", "Divorced", "Widow(er)", "Never Married")
+)
+
+painYn <-  as.logical(x=painYn) # Also see as.factor, as.numeric(), as.character()
+
+vec_test <- c(1:14, "b", "c") # what would be the type of vector
+                          # Can you make them numeric
+                          # what is the impact of forcing them to be numeric
+
+str(Sex)
+summary(Sex)
+Sex^2
+```
+
+### Getting attributes, sub-sets, and elements from vectors
+```{r }
+class(Sex)
+class(age)
+Sex[1:4]
+Sex[age >28]
+cbind(age, Sex)
+Sex[1]
+c(Sex[1], age[1])
+```
+
+### Data frame
+```{r }
+# Combine vectors to a data frame 
+dat <- data.frame(clusterID, householdID, age, Sex, pain, painYn)
+names(dat)
+#names(dat) <- c("a", "B", "C", "d", "E", "f") you can change the column names
+# attributes of a data frame
+nrow(dat)
+ncol(dat)
+class(dat)
+str(dat)
+head(dat)
+tail(dat)
+# Challenge: write code to see how How many missing in the data frame
+
+# Take a vector out from the data frame
+dat$clusterID 
+# or 
+dat[["clusterID"]]
+# or
+dat[[1]]
+# or
+dat[,1]
+
+# Take a data poit out from a vector of a dataframe
+dat[2,2] # extract second element of the second column of dat data frame
+dat[1,] # extract first row with all columns
+dat[age>20,] # extract subjects all columns whose ages are >20
+dat[age>20, "Sex"]
+dat[age>20, c("Sex", "age")]
+dat[age>20, 2:3] # do you see any problem with this one regarding human readability?
+with(dat, summary(Sex)) # with attach all vectors of a data frame locally
+cbind(dat, ageNA) 
+rbind(dat, dat[1,]) # append rows to the data frame
+```
+
+### List
+```{r }
+dat2 <- dat[c(2,4,6),]
+list_dat <- list(df = dat, df2 = dat2, mat = matrix(c(3,9,5,1,-2,8), nrow = 2 ), 
+vec = ageNA, vec_test )
+names(list_dat)
+list_dat$df
+list_dat[[2]]
+class(list_dat[[2]])
+```
+
+## Missing observations in R
+
+*	Numeric missing observations are displayed as `NA` implies not available
+*	Not a number (`NaN`). This happens when a numeric operation retains undefined 
+  results. For example, try `log(0)` in the command window
+*	A character missing is displayed as blank. If you keep a space in the data, 
+  it will be shown as blank but R cannot identify this as missing. 
+
+
+## Session 1 Challenge
+
+create a sequence of 1,2 by repeating 1,2 8 times. Stor the vector by a name. 
+check the type of vector. Change the type of vector to factor with labels 
+1 = Morning and 2 = Evening. Show that the variable is converted to a factor. 
+Add the vector with the data frame dat that we created yesterday.
+
+________________________________________________________________________________
+
+
+# Session 2: Tidyverse for data management
+
+The `tidyverse` is a collection of `R` packages that are designed to work 
+together. The package `dpyr` and `tidyr` performs most common data manipulation 
+tools. `readxl` and readr is to read and write data, `stringr` is to handle 
+string data manipulation, `ggplot2` for graphing, `lubridate` is for managing 
+date variables and operations. If you load `tidyverse`, it will automatically 
+load all packages under it. 
+
+
+```{r img-with-knitr, echo=FALSE, fig.align='center', out.width='100%', fig.cap='Tidyverse components. Source: data wrangler github site'}
+knitr::include_graphics("Q:/Scientific/YS/R_workshop/tidy.png")
+```
+
+Let us read a data first to explore the vastness of `tidyverse.` 
+
+```{r }
+# Read a data file
+rm(list = ls())
+setwd("Q:/Scientific/YS/R_workshop")
+
+# Loading necessary libraries for data processing and analysis
+library(tidyverse)
+
+# Importing a csv file into R working environment
+dfSession4a <- read_csv(
+  file = "data_1.csv"
+)
+
+dfSession4a <- readxl::read_xlsx(
+ path =  "data_2.xlsx", sheet = "Sheet1"
+)
+help("read_xlsx") # you migh have some more flexibility with excel files
+
+# Checking variable properties and first few data points
+glimpse(dfSession4a)
+# Defining appropriate measurement scale for "sex" 
+# "pain" and "marital"
+dfSession4a <- dfSession4a %>%
+  mutate(
+    sexNominal = factor(
+      x = sex,
+      levels = c(1,2),
+      labels = c("Male", "Female")
+    ),
+    painOrdinal = factor(
+      x = pain,
+      levels = c(1,2, 3),
+      labels = c("No Pain", "Mild Pain", "Severe Pain"),
+      ordered = TRUE
+    ),
+    maritalNominal = factor(
+      x = marital,
+      levels = c(1,2,3,4),
+      labels =  c("Married", "Divorced", "Widow(er)", "Never Married")
+    )
+  )
+
+# vector (variable can be mutated separately. efining appropriate measurement 
+# scale for painYn variable
+dfSession4a <- dfSession4a %>%
+  mutate(
+    painYn = as.logical(x=painYn)
+  )
+
+# Exporting processed data into a csv file
+    # write_csv(
+    #   x = dfSession4a,
+    #   file = "df_session4_processed_data.csv"
+    # )
+
+```
+
+The following commands are frequently needed to manage data: 
+
+*	`%>%` pipes: Pipes are the simplest method of input data to an r function. 
+  You can use multiple pipes to perform multiple processing sequentially by 
+  inputing the data until the final output comes. 
+*	`select()`: subset columns often write as `dplyr::select()`
+*	`filter()`: subset rows on conditions
+*	`mutate()`: create new columns by using information from other columns
+*	`group_by()`: and summarize(): create summary statistics on grouped data
+*	`arrange()`: sort results
+*	`count()`: count discrete values
+*	`summarize()`
+*	`filter(!is.na(weight))`
+*	`replace_na()`
+*	Date and time functions, `sys.time()`, `weekdays()`, `months()`, `year()`
+*	Also please explore `union()`, `intersection()`, `setdiff()`, `%in%`, 
+`unique()` and `duplicated()` useful for data management
+*	`strsplit(x, “ ”)`
+*	`grep(“abc” , stringx)`
+
+### Using pipes
+```{r }
+# At a single command using pipes
+read_csv(file = "data_1.csv") %>%
+  mutate(
+    sexNominal = factor(
+      x = sex,
+      levels = c(1, 2),
+      labels = c("Male", "Female")
+    ),
+    painOrdinal = factor(
+      x = pain,
+      levels = c(1, 2, 3),
+      labels = c("No Pain", "Mild Pain", "Severe Pain"),
+      ordered = TRUE
+    ),
+    maritalNominal = factor(
+      x = marital,
+      levels = c(1, 2, 3, 4),
+      labels =  c("Married", "Divorced", "Widow(er)", "Never Married")
+    )
+  ) %>%
+  mutate(painYn = as.logical(x = painYn)) %>%
+  write_csv(file = "df_session4_processed_data.csv")
+
+help(mutate) #explore
+# without changing the original R environment, we can write the data with all
+# modifications which is the advantage of pipe
+```
+
+### Extract and arrange cases
+```{r }
+filter(.data = dfSession4a, age >25, sexNominal == "Male")
+dfSession4a %>% filter(age >25, sexNominal == "Male") # explore slice or
+dfSession4a %>% filter(age >25) %>% slice(c(3,8))
+```
+
+### Applying R base functions to the tidyverse functions
+```{r }
+help("table") # table is an R base function creates table
+table(dfSession4a$sexNominal)
+with(dfSession4a, table(sexNominal))
+dfSession4a %>% with(., table(sexNominal))
+```
+
+### Subsetting columns and group wise summarization of data
+```{r }
+dfSession4a %>% 
+  select(clusterID, householdID, age, sexNominal ) %>% 
+  group_by(sexNominal) %>%
+  summarize(n = n(), mean_age = mean(age))
+```
+
+
+### bind columns independently and bind cols by relation
+```{r }
+df1 <- data.frame(team = c('A', 'A', 'B', 'B'),
+                  points = c(12, 14, 19, 24))
+
+
+df2 <- data.frame(team = c('A', 'B', 'C', 'C'),
+                  points = c(8, 17, 22, 25))
+
+df3 <- data.frame(team = c('A', 'B', 'C', 'C'),
+                  assists = c(4, 9, 12, 6))
+bind_rows(df1, df2, df3) # equivalent to rbind()
+bind_cols(df1, df2, df3) # equivalent to cbind()
+```
+
+
+### Merge with single id variable
+Please consult (https://www.guru99.com/r-dplyr-tutorial.html) for further 
+detail. These are mostly paraphrased from the page. I used the page directly 
+for the practicaldemonstration of merge during the training
+
+```{r }
+# You must have the unique id filed
+
+df_primary <- tribble(~ ID, ~ y,
+                      "A", 5,
+                      "B", 5,
+                      "C", 8,
+                      "D", 0,
+                      "F", 9)
+df_secondary <- tribble(~ ID, ~ z,
+                        "A", 30,
+                        "B", 21,
+                        "C", 22,
+                        "D", 25,
+                        "E", 29)
+
+df_primary %>% left_join(df_secondary, by ='ID')
+right_join(df_primary, df_secondary, by ='ID')
+full_join(df_primary, df_secondary, by ='ID')
+inner_join(df_primary, df_secondary, by ='ID')
+```
+
+
+### Merge with multiple id variable
+```{r }
+df_primary <- tribble(
+  ~ID, ~year, ~items,
+  "A", 2015,3,
+  "A", 2016,7,
+  "A", 2017,6,
+  "B", 2015,4,
+  "B", 2016,8,
+  "B", 2017,7,
+  "C", 2015,4,
+  "C", 2016,6,
+  "C", 2017,6)
+df_secondary <- tribble( 
+  ~ID, ~year, ~prices,
+  "A", 2015,9,
+  "A", 2016,8,
+  "A", 2017,12,
+  "B", 2015,13,
+  "B", 2016,14,
+  "B", 2017,6,
+  "C", 2015,15,
+  "C", 2016,15,
+  "C", 2017,13
+  )
+left_join(df_primary, df_secondary, by = c('ID'))
+
+duplicated(
+  select(df_primary, c("ID", "year"))
+  )
+```
+
+
+### Reshape long to wide to long
+Please consult the page (https://datacarpentry.org/R-ecology-lesson/03-dplyr.html)
+where reshape was detailed. I used the page for practical demonstration. 
+
+
+```{r }
+# Wide to long data
+pivot_longer(
+bind_cols(df1, df2, df3), 
+  cols = c("team...1", "team...3", "team...5"), 
+  names_to = "team", 
+  values_to = "Values"
+)
+# little more advance
+lon_dat <- pivot_longer(
+  bind_cols(df1, df2, df3), 
+  cols = c("team...1", "team...3", "team...5"), 
+  names_prefix = "team...",
+  names_to = "team", 
+  values_to = "Values"
+) %>%
+  pivot_longer(
+    cols = starts_with("points"),
+    names_prefix = "points...",
+    names_to = "point",
+    values_to = "values_point"
+  )
+```
+
+```{r }
+# Long to wide
+pivot_wider(
+  lon_dat,
+  id_cols = NULL,
+  names_from = "team",
+  values_from = "Values"
+)
+
+lon_dat %>% 
+pivot_wider(
+  id_cols = NULL,
+  names_from = "team",
+  values_from = "Values",
+  names_prefix = "team..."
+)
+```
+
+--------------------------------------------------------------------------------
+
+# Session 3 Write custom functions and apply repeatatively
+
+## Writing functions in R
+A R function has the following parts
+
+* Function names: Mandatory. You will call the function by the name 
+* function command: Mandatory
+* Arguments: Optional. Arguments are like the input channel by which you will 
+input your data in specific formal. You can pass any object that r can compile. 
+There is not limit of the number of argument however that should be simple.
+* Processing codes: Optional. We process the data received from the argument 
+channels
+* Return: ```return``` command is optional. 
+
+
+```
+function_name <- function(arg1, arg2, ... ) {
+        # Code
+	# return ()
+}
+```
+
+
+We will use ```iris``` data for this sessions
+
+```{r }
+data(iris)
+head(iris)
+```
+
+
+The function fCV will allow you to pass a numeric vector argument and returns 
+the coefficients of variations (CV)
+
+```{r cars}
+fCV <- function(numVec){
+  avg <- mean(numVec)
+  std <- sd(numVec)
+  cv <- std/avg
+  return(CV = cv )
+}
+fCV(iris$Sepal.Length)
+
+```
+* `fCV` is the function name
+* numVec is an argument
+* return is the CV which we get based on the supplied vector. 
+
+Suppose we want to look at the average and standard deviation along with the CV
+
+```{r }
+fCV <- function(numVec){
+  avg <- mean(numVec)
+  std <- sd(numVec)
+  cv <- std/avg
+  return(c(avg, std, cv) )
+}
+fCV(iris$Sepal.Length)
+
+
+```
+
+Let us take a formatted output so that we understand which was what
+
+```{r }
+fCV <- function(numVec){
+  avg <- mean(numVec)
+  std <- sd(numVec)
+  cv <- std/avg
+  return(c(Average = avg, STD = std, CV = cv) )
+}
+fCV(iris$Sepal.Length)
+```
+
+
+Let us use a dataframe as an argument
+```{r }
+# argumet 1: dframe is a dataframe of all numeric columns
+# output: return the column means of dframe
+fcolmean <- function(dframe){
+  avg <- colMeans(dframe)
+  return(avg)
+}
+fcolmean(iris[1:4])
+```
+
+
+```{r }
+# argumet 1: dframe is a dataframe of all numeric columns
+# output: return the column medians of dframe
+fcolmean2 <- function(dframe){
+  avg <- apply(dframe,2,median)
+  return(avg)
+}
+fcolmean2(iris[1:4])
+
+```
+
+## Repeat functions for multiple times
+
+suppose you have to find the column means for all three species in the data.
+First let us divide the data by species and make them as list of dataframes
+
+```{r }
+group_split(iris, Species)
+```
+Let us apply our function to each element of the list. 
+
+### R base style 
+
+```{r }
+lapply(group_split(iris, Species), function(i) fcolmean(i[1:4]))      
+sapply(group_split(iris, Species), function(i) fcolmean(i[1:4]))  
+class(
+  sapply(group_split(iris, Species), function(i) fcolmean(i[1:4]))  
+
+)
+```
+
+### tidyverse` `style. Use` `map` commands
+
+```{r }
+# Return results in a list
+group_split(iris, Species) %>% map(~fcolmean(.[1:4]))
+
+```
+
+```{r }
+# return results in a data frame`
+group_split(iris, Species) %>% map_dfr(~fcolmean(.[1:4]))
+```
+
+Explore `apply` and `mapply`. For parallel processing, `mclapply()`, and `parLapply()`.
+
+A few more variants of map Other map variants: `help("map")`. 
+Basic structure remains the same `map2()` and `pmap()` is a bit advanced 
+command that applied to the functions using two and more than two lists. 
+
+Tidyverse is more convenient for data rangling as always.
+
+
+## Conditional Statement
+
+When an execution depends on any condition. General conditional statement 
+structure is as follows
+### When there is only one condition to satisfy
+```
+if (test_expression) {
+  statement
+}
+```
+interpretaion of the if statement: if the test_expression holds true then 
+perform the statement (commands). The test_expression only compare scalar 
+quantity.
+
+
+### When there are two conditions to satisfy
+```
+if (test_expression) {
+  statement1
+} else {
+  statement2
+}
+```
+Interpretation, if test_expression holds true, perform statement 1 else perform 
+statement 2.
+
+```{r } 
+# An example of conditional statement
+x <- -5
+if (x > 0) {
+  print("Non-negative number")
+} else {
+  print("Negative number")
+}
+
+```
+
+
+Apply ifelse to custom functions
+```{r }
+
+x <- 2
+if (x == 1) {
+  group_split(iris, Species) %>% map_dfr( ~ fcolmean(.[1:4]))
+  
+} else {
+  group_split(iris, Species) %>% map_dfr( ~ fcolmean2(.[1:4]))
+}
+```
+
+
+`ifelse`, `case_when`, `which()`, and `switch()` are different variations of applying complex
+conditional statement. Few more examples for the conditional statements are as follows;
+
+```{r }
+which(iris$Petal.Width > 2)
+rowSums(iris[which(iris$Petal.Width > 2), 1:4])
+test <- 1  # executes statement 3, sd
+switch(test,
+       mean(iris$Petal.Width),
+       median(iris$Petal.Width),
+       sd(iris$Petal.Width)) # statement #3, sd()
+```
+
+
+## Getting data from the REDcap server
+Primarily you will require to have an Application Programming Interface (API) 
+token to access the project data from the REDcap server. API allows multiple 
+software to talk each other. You can export all sorts of data using API. 
+Getting token involves the following steps:
+
+* Project administrator will give you the user right to receive data by API
+* Your role is to ask for a token for a project to the REDcap administrator via
+REDcap API link
+* REDcap administrator will provide you a token upon the consent of the PI
+
+Once you received the token, the token will be visible to your redcap account.
+To download the data using API, go to the API playground link of the Redcap. 
+Common data we get from redcap are reports, instruments, records, 
+and variables. You download data according to the purpose. However, here are a 
+few examples are as follows:
+```{r echo=FALSE }
+token = "80D5CB91DD8DF5C28BA0E232BF9ACA63"
+url <- "https://cri-datacap.org/api/"
+```
+
+### Export a Redcap report
+```{r }
+formData <- list(
+  "token" = token,
+  content = 'report',
+  format = 'json',
+  report_id = '13630', # refers to the demographic report
+  csvDelimiter = '',
+  rawOrLabel = 'raw',
+  rawOrLabelHeaders = 'raw',
+  exportCheckboxLabel = 'false',
+  returnFormat = 'json'
+)
+response <- httr::POST(url, body = formData, encode = "form")
+result <- as.tibble(do.call(rbind, httr::content(response)))
+glimpse(result)
+```
+
+### Export multiple records from a projects
+
+```{r }
+formData <- list("token"=token,
+    content='record',
+    action='export',
+    format='json',
+    type='flat',
+    csvDelimiter='',
+    'records[0]'='POST-RES-0093',
+    'records[1]'='POST-RES-0094',
+    'records[2]'='POST-RES-0096',
+    'records[3]'='POST-RES-0097',
+    'records[4]'='POST-RES-0099',
+    'records[5]'='POST-RES-0101',
+    'records[6]'='POST-RES-0102',
+    'forms[0]'='cesd',### 
+    rawOrLabel='raw',
+    rawOrLabelHeaders='raw',
+    exportCheckboxLabel='false',
+    exportSurveyFields='false',
+    exportDataAccessGroups='false',
+    returnFormat='json'
+)
+response <- httr::POST(url, body = formData, encode = "form")
+result <- as.data.frame(do.call(rbind, httr::content(response)))
+glimpse(result)
+```
+
+If you remove the forms line from the code (line 273), the records from all insturments
+will be imported to the dataframe which is difficult to handle (you try it). 
+
+
+
+
+
+
